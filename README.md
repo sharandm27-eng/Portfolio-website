@@ -2,7 +2,7 @@
 
 An interactive, animation-driven portfolio built to showcase real-world projects, skills, and experience — designed with a bold dark-red aesthetic, custom cursor effects, and smooth page transitions.
 
-**Live Site:** [Add your deployed Vercel/Netlify link here]
+**Live Site:** https://portfolio-website-one-beta-32.vercel.app/
 
 ---
 
