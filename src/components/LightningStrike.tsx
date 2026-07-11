@@ -22,11 +22,21 @@ export function LightningStrike() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [isActive, setIsActive] = useState(false);
   const [flashAlpha, setFlashAlpha] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
 
   // Store active lightning bolts and current flash alpha value in refs to avoid useEffect closure warning
   const boltsRef = useRef<Bolt[]>([]);
   const strikeProgressRef = useRef(0); // 0 to 1 for downward strike animation
   const flashAlphaRef = useRef(0);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   useEffect(() => {
     // Only play lightning strike on the home/landing page
@@ -35,7 +45,49 @@ export function LightningStrike() {
       return;
     }
 
-    // Start lightning transition on path change
+    if (isMobile) {
+      setIsActive(true);
+
+      const startTime = performance.now();
+      let animId: number;
+
+      const animateMobileFlash = (time: number) => {
+        const elapsed = time - startTime;
+        const duration = 450; // 450ms total transition
+
+        if (elapsed >= duration) {
+          setFlashAlpha(0);
+          setIsActive(false);
+          return;
+        }
+
+        // Double-peak lightning flash signature (highly performant and responsive on mobile screen sizes)
+        let alpha = 0;
+        if (elapsed < 120) {
+          // First peak (up to 0.35, then decay to 0.05)
+          const t = elapsed / 120;
+          alpha = t < 0.3 ? (t / 0.3) * 0.35 : 0.35 - ((t - 0.3) / 0.7) * 0.3;
+        } else if (elapsed < 350) {
+          // Second peak (up to 0.5, then decay to 0.05)
+          const t = (elapsed - 120) / 230;
+          alpha = t < 0.25 ? 0.05 + (t / 0.25) * 0.45 : 0.5 - ((t - 0.25) / 0.75) * 0.45;
+        } else {
+          // Final decay to 0
+          const t = (elapsed - 350) / 100;
+          alpha = 0.05 * (1 - t);
+        }
+
+        setFlashAlpha(Math.max(0, alpha));
+        animId = requestAnimationFrame(animateMobileFlash);
+      };
+
+      animId = requestAnimationFrame(animateMobileFlash);
+      return () => {
+        cancelAnimationFrame(animId);
+      };
+    }
+
+    // Start lightning transition on path change (Desktop Only)
     setIsActive(true);
     strikeProgressRef.current = 0;
     flashAlphaRef.current = 0.35;
@@ -237,7 +289,7 @@ export function LightningStrike() {
       cancelAnimationFrame(animationFrameId);
       clearTimeout(secTimer);
     };
-  }, [pathname]);
+  }, [pathname, isMobile]);
 
   return (
     <>
@@ -254,18 +306,20 @@ export function LightningStrike() {
         }}
       />
       {/* Lightning Canvas */}
-      <canvas
-        ref={canvasRef}
-        style={{
-          position: "fixed",
-          inset: 0,
-          width: "100vw",
-          height: "100vh",
-          pointerEvents: "none",
-          zIndex: 85,
-          display: isActive ? "block" : "none",
-        }}
-      />
+      {!isMobile && (
+        <canvas
+          ref={canvasRef}
+          style={{
+            position: "fixed",
+            inset: 0,
+            width: "100vw",
+            height: "100vh",
+            pointerEvents: "none",
+            zIndex: 85,
+            display: isActive ? "block" : "none",
+          }}
+        />
+      )}
     </>
   );
 }
