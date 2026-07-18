@@ -101,7 +101,7 @@ function Skills() {
               {group.skills.map((skill) => (
                 <div
                   key={skill.name}
-                  className="flex items-center gap-4 bg-foreground/[0.03] hover:bg-foreground/[0.06] border border-foreground/10 hover:border-ember/30 rounded-2xl p-2.5 pr-5 transition-all duration-300 group cursor-default"
+                  className="flex items-center gap-4 bg-foreground/[0.03] hover:bg-foreground/[0.06] border border-foreground/10 hover:border-[#4A9EFF]/30 rounded-2xl p-2.5 pr-5 transition-all duration-300 group cursor-default"
                 >
                   <div className="relative">
                     {/* soft cyan-white glow effect behind the icon */}
@@ -113,7 +113,7 @@ function Skills() {
                     </div>
                   </div>
                   <div className="flex flex-col">
-                    <span className="font-mono text-xs uppercase tracking-wider text-foreground/90 group-hover:text-ember transition-colors duration-300 select-none">
+                    <span className="font-mono text-xs uppercase tracking-wider text-foreground/90 group-hover:text-[#4A9EFF] transition-colors duration-300 select-none">
                       {skill.name}
                     </span>
                   </div>
