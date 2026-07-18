@@ -183,6 +183,10 @@
   color: var(--ember);
 }
 
+@utility text-neon-blue {
+  color: #4A9EFF;
+}
+
 @utility bg-ember {
   background-color: var(--ember);
 }

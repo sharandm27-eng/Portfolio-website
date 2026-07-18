@@ -15,6 +15,7 @@ export function CustomCursor() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const mouseRef = useRef({ x: -1000, y: -1000 });
   const [isHovered, setIsHovered] = useState(false);
+  const [isNavHovered, setIsNavHovered] = useState(false);
 
   // Position history for lightning discharge targets
   const trailLength = 8;
@@ -49,20 +50,34 @@ export function CustomCursor() {
 
     const handleMouseOver = (e: MouseEvent) => {
       const target = e.target as HTMLElement | null;
-      if (
-        target &&
-        (target.closest("a") ||
-          target.closest("button") ||
-          target.closest("[data-cursor]") ||
-          target.closest('[role="button"]') ||
-          window.getComputedStyle(target).cursor === "pointer")
-      ) {
+      if (!target) return;
+
+      const isLink = 
+        target.closest("a") ||
+        target.closest("button") ||
+        target.closest("[data-cursor]") ||
+        target.closest('[role="button"]') ||
+        window.getComputedStyle(target).cursor === "pointer";
+
+      if (isLink) {
         setIsHovered(true);
+      }
+
+      // Check if this is specifically a navigation link
+      const isNavLink = 
+        target.closest("[data-cursor='visit']") || 
+        target.closest("header a") || 
+        target.closest("[data-cursor='home']") ||
+        target.closest("[data-cursor='menu']");
+
+      if (isNavLink) {
+        setIsNavHovered(true);
       }
     };
 
     const handleMouseOut = () => {
       setIsHovered(false);
+      setIsNavHovered(false);
     };
 
     window.addEventListener("mousemove", handleMouseMove);
@@ -176,8 +191,14 @@ export function CustomCursor() {
       // Rotate HUD elements
       rotationRef.current += 0.04;
 
-      // Handle hover scale transitions
-      targetOrbRadius = isHovered ? 14 : 8;
+      // Handle hover scale transitions (scale up more on navigation link hover)
+      if (isNavHovered) {
+        targetOrbRadius = 18;
+      } else if (isHovered) {
+        targetOrbRadius = 13;
+      } else {
+        targetOrbRadius = 8;
+      }
       currentOrbRadius += (targetOrbRadius - currentOrbRadius) * 0.15;
 
       // Easing segment history targets
@@ -213,7 +234,8 @@ export function CustomCursor() {
             length: Math.random() * 8 + 4,
             alpha: 1.0,
             decay: Math.random() * 0.04 + 0.03,
-            color: Math.random() < 0.5 ? "rgba(0, 240, 255, " : "rgba(255, 110, 0, ",
+            // Electric blue and cyan-blue sparks (no red/orange tones)
+            color: Math.random() < 0.5 ? "rgba(0, 240, 255, " : "rgba(74, 158, 255, ",
           });
         }
         lastTimeRef.current = time;
@@ -223,7 +245,11 @@ export function CustomCursor() {
       if (segments[0].x !== -1000) {
         ctx.globalCompositeOperation = "lighter";
 
-        // Bolt 1: Cyan/Blue lightning discharges to mid-trail
+        // Intensify glow size and thickness on navigation link hover
+        const thicknessMultiplier = isNavHovered ? 1.6 : 1.0;
+        const glowMultiplier = isNavHovered ? 1.8 : 1.0;
+
+        // Bolt 1: Bright Sky Blue/Neon Blue lightning discharges to mid-trail
         if (Math.random() < 0.65) {
           drawLightningBolt(
             segments[0].x,
@@ -231,13 +257,13 @@ export function CustomCursor() {
             segments[3].x + (Math.random() - 0.5) * 15,
             segments[3].y + (Math.random() - 0.5) * 15,
             "#ffffff",
-            "rgba(0, 200, 255, 0.95)",
-            1.2,
-            12,
+            isNavHovered ? "rgba(0, 240, 255, 1)" : "rgba(74, 158, 255, 0.95)",
+            1.2 * thicknessMultiplier,
+            12 * glowMultiplier,
           );
         }
 
-        // Bolt 2: Orange lightning discharges to end-trail
+        // Bolt 2: Neon Cyan lightning discharges to end-trail (changed from orange-red to bright blue)
         if (Math.random() < 0.65) {
           drawLightningBolt(
             segments[0].x,
@@ -245,9 +271,9 @@ export function CustomCursor() {
             segments[6].x + (Math.random() - 0.5) * 15,
             segments[6].y + (Math.random() - 0.5) * 15,
             "#ffffff",
-            "rgba(255, 100, 0, 0.95)",
-            1.2,
-            12,
+            isNavHovered ? "rgba(0, 240, 255, 1)" : "rgba(0, 200, 255, 0.95)",
+            1.2 * thicknessMultiplier,
+            12 * glowMultiplier,
           );
         }
 
@@ -257,8 +283,9 @@ export function CustomCursor() {
           const arcDistance = Math.random() * 35 + 20;
           const tx = segments[0].x + Math.cos(randomArcAngle) * arcDistance;
           const ty = segments[0].y + Math.sin(randomArcAngle) * arcDistance;
+          // Random color between two electric blue/cyan tones
           const randomColor =
-            Math.random() < 0.5 ? "rgba(0, 200, 255, 0.9)" : "rgba(255, 100, 0, 0.9)";
+            Math.random() < 0.5 ? "rgba(0, 200, 255, 0.9)" : "rgba(74, 158, 255, 0.9)";
           drawLightningBolt(segments[0].x, segments[0].y, tx, ty, "#ffffff", randomColor, 0.8, 8);
         }
       }
@@ -297,9 +324,9 @@ export function CustomCursor() {
         const hx = segments[0].x;
         const hy = segments[0].y;
 
-        // Draw HUD Outer Rotating Bracket (Cyan)
+        // Draw HUD Outer Rotating Bracket (Bright Neon Blue)
         ctx.beginPath();
-        ctx.strokeStyle = "rgba(0, 240, 255, 0.8)";
+        ctx.strokeStyle = isNavHovered ? "rgba(0, 240, 255, 1)" : "rgba(74, 158, 255, 0.85)";
         ctx.lineWidth = 1.5;
         ctx.arc(
           hx,
@@ -320,9 +347,9 @@ export function CustomCursor() {
         );
         ctx.stroke();
 
-        // Draw HUD Inner Rotating Bracket (Orange - rotating backwards)
+        // Draw HUD Inner Rotating Bracket (Cyan/Electric Blue - rotating backwards)
         ctx.beginPath();
-        ctx.strokeStyle = "rgba(255, 100, 0, 0.85)";
+        ctx.strokeStyle = isNavHovered ? "rgba(0, 240, 255, 1)" : "rgba(0, 200, 255, 0.85)";
         ctx.lineWidth = 1.2;
         ctx.arc(
           hx,
@@ -362,7 +389,7 @@ export function CustomCursor() {
       window.removeEventListener("mouseout", handleMouseOut);
       cancelAnimationFrame(animationFrameId);
     };
-  }, [isHovered]);
+  }, [isHovered, isNavHovered]);
 
   return (
     <canvas ref={canvasRef} className="pointer-events-none fixed inset-0 z-[99999] h-full w-full" />

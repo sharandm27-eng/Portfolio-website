@@ -36,11 +36,11 @@ export function Nav() {
               key={l.to}
               to={l.to}
               data-cursor="visit"
-              className="group relative font-mono text-xs uppercase tracking-[0.25em]"
-              activeProps={{ className: "text-ember" }}
+              className="group relative font-mono text-xs uppercase tracking-[0.25em] hover:text-[#4A9EFF] transition-colors duration-300"
+              activeProps={{ className: "text-neon-blue" }}
             >
               {l.label}
-              <span className="absolute -bottom-1 left-0 h-px w-0 bg-foreground transition-all duration-300 group-hover:w-full" />
+              <span className="absolute -bottom-1 left-0 h-px w-0 bg-foreground transition-all duration-300 group-hover:w-full group-hover:bg-[#4A9EFF]" />
             </Link>
           ))}
         </nav>
@@ -91,8 +91,8 @@ export function Nav() {
                   <Link
                     to={l.to}
                     onClick={() => setIsOpen(false)}
-                    className="font-display text-4xl sm:text-6xl uppercase tracking-widest text-foreground hover:text-ember active:text-ember transition-colors block py-2 select-none"
-                    activeProps={{ className: "text-ember" }}
+                    className="font-display text-4xl sm:text-6xl uppercase tracking-widest text-foreground hover:text-[#4A9EFF] active:text-[#4A9EFF] transition-colors block py-2 select-none"
+                    activeProps={{ className: "text-neon-blue" }}
                   >
                     {l.label === "Index" ? "Home" : l.label}
                   </Link>
