@@ -108,7 +108,7 @@ function Skills() {
                     <div className="absolute inset-0 bg-[rgba(180,230,255,0)] group-hover:bg-[rgba(180,230,255,0.08)] rounded-xl blur-lg transition-all duration-300 pointer-events-none" />
                     
                     {/* icon container (slightly lighter/darker than the section background, not pure black) */}
-                    <div className="w-[52px] h-[52px] flex items-center justify-center bg-[#151520]/80 border border-foreground/10 rounded-xl relative z-10 transition-all duration-300 group-hover:scale-110 group-hover:border-[rgba(180,230,255,0.4)] group-hover:shadow-[0_0_15px_rgba(180,230,255,0.25)]">
+                    <div className="w-[52px] h-[52px] flex items-center justify-center bg-[#151520]/80 border border-foreground/10 rounded-xl relative z-10 transition-all duration-300 group-hover:scale-110 group-hover:border-[rgba(180,230,255,0.6)] shadow-skill-glow group-hover:shadow-skill-glow-intense">
                       <BrandIcon slug={skill.slug} color={skill.color} className="w-6 h-6 transition-transform duration-300 group-hover:rotate-[10deg] ease-in-out" />
                     </div>
                   </div>
